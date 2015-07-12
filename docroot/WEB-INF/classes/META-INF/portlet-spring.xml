@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	<bean id="com.bihan.exportmanager.service.ExportManagerLocalService" class="com.bihan.exportmanager.service.impl.ExportManagerLocalServiceImpl" />
+	<bean id="com.bihan.exportmanager.service.ExportManagerService" class="com.bihan.exportmanager.service.impl.ExportManagerServiceImpl" />
+	<bean id="com.bihan.exportmanager.service.persistence.ExportManagerPersistence" class="com.bihan.exportmanager.service.persistence.ExportManagerPersistenceImpl" parent="basePersistence" />
+	<bean id="com.bihan.exportmanager.service.ExportManagerFieldLocalService" class="com.bihan.exportmanager.service.impl.ExportManagerFieldLocalServiceImpl" />
+	<bean id="com.bihan.exportmanager.service.ExportManagerFieldService" class="com.bihan.exportmanager.service.impl.ExportManagerFieldServiceImpl" />
+	<bean id="com.bihan.exportmanager.service.persistence.ExportManagerFieldPersistence" class="com.bihan.exportmanager.service.persistence.ExportManagerFieldPersistenceImpl" parent="basePersistence" />
+</beans>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false">
+	<import class="com.bihan.exportmanager.model.ExportManager" />
+	<import class="com.bihan.exportmanager.model.ExportManagerField" />
+	<class name="com.bihan.exportmanager.model.impl.ExportManagerImpl" table="EM_ExportManager">
+		<cache usage="read-write" />
+		<id name="exportManagerId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="createDate" type="org.hibernate.type.TimestampType" />
+		<property name="modifiedDate" type="org.hibernate.type.TimestampType" />
+		<property name="name" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="classNameId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="classNameValue" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="scope" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+	</class>
+	<class name="com.bihan.exportmanager.model.impl.ExportManagerFieldImpl" table="EM_ExportManagerField">
+		<cache usage="read-write" />
+		<id name="exportManagerFieldId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="exportManagerId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="fieldName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="fieldDisplayName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="position" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+	</class>
+</hibernate-mapping>

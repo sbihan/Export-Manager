@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<hook>
+	
+	<language-properties>
+		content/Language_fr.properties
+	</language-properties>
+	<language-properties>
+		content/Language_en.properties
+	</language-properties>
+	<language-properties>
+		content/Language.properties
+	</language-properties>
+</hook>

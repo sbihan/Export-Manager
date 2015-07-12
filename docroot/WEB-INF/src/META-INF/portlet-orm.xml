@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd">
+	<persistence-unit-metadata>
+		<xml-mapping-metadata-complete/>
+		<persistence-unit-defaults>
+			<access>PROPERTY</access>
+		</persistence-unit-defaults>
+	</persistence-unit-metadata>
+	<mapped-superclass class="com.bihan.exportmanager.model.impl.ExportManagerModelImpl">
+		<attributes>
+			<id name="exportManagerId" />
+			<basic name="companyId" />
+			<basic name="userId" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="modifiedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="name" />
+			<basic name="description" />
+			<basic name="classNameId" />
+			<basic name="classNameValue" />
+			<basic name="scope" />
+			<transient name="className" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.bihan.exportmanager.model.impl.ExportManagerFieldModelImpl">
+		<attributes>
+			<id name="exportManagerFieldId" />
+			<basic name="exportManagerId" />
+			<basic name="fieldName" />
+			<basic name="fieldDisplayName" />
+			<basic name="position" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<entity class="com.bihan.exportmanager.model.impl.ExportManagerImpl" name="ExportManager">
+		<table name="EM_ExportManager" />
+		<attributes />
+	</entity>
+	<entity class="com.bihan.exportmanager.model.impl.ExportManagerFieldImpl" name="ExportManagerField">
+		<table name="EM_ExportManagerField" />
+		<attributes />
+	</entity>
+</entity-mappings>

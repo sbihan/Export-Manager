@@ -1,0 +1,1 @@
+Liferay.Service.register("Liferay.Service.EM", "com.bihan.exportmanager.service", "export-manager-portlet");

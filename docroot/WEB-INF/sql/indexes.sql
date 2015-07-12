@@ -1,0 +1,1 @@
+create index IX_D2C20246 on EM_ExportManagerField (exportManagerId);

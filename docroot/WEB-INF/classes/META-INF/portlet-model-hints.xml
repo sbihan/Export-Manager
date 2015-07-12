@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<model-hints>
+	<model name="com.bihan.exportmanager.model.ExportManager">
+		<field name="exportManagerId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="name" type="String" />
+		<field name="description" type="String" />
+		<field name="classNameId" type="long" />
+		<field name="classNameValue" type="String" />
+		<field name="scope" type="String" />
+	</model>
+	<model name="com.bihan.exportmanager.model.ExportManagerField">
+		<field name="exportManagerFieldId" type="long" />
+		<field name="exportManagerId" type="long" />
+		<field name="fieldName" type="String" />
+		<field name="fieldDisplayName" type="String" />
+		<field name="position" type="int" />
+	</model>
+</model-hints>
