@@ -16,73 +16,9 @@
 			<mime-type>text/html</mime-type>
 		</supports>
 		<portlet-info>
-			<title>Export Manager</title>
-			<short-title>Export Manager</short-title>
-			<keywords>Export Manager</keywords>
-		</portlet-info>
-		<security-role-ref>
-			<role-name>administrator</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>guest</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>portal-table</portlet-name>
-		<display-name>Portal Table</display-name>
-		<portlet-class>
-			com.bihan.exportmanager.web.PortalTableController
-		</portlet-class>
-		<init-param>
-			<name>view-template</name>
-			<value>/data-table/portal/view.jsp</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<portlet-info>
-			<title>Portal Table</title>
-			<short-title>Portal Table</short-title>
-			<keywords>Portal Table</keywords>
-		</portlet-info>
-		<security-role-ref>
-			<role-name>administrator</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>guest</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>site-table</portlet-name>
-		<display-name>Site Table</display-name>
-		<portlet-class>
-			com.bihan.exportmanager.web.SiteTableController
-		</portlet-class>
-		<init-param>
-			<name>view-template</name>
-			<value>/data-table/site/view.jsp</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<portlet-info>
-			<title>Site Table</title>
-			<short-title>Site Table</short-title>
-			<keywords>Site Table</keywords>
+			<title>Database Viewer</title>
+			<short-title>Database Viewer</short-title>
+			<keywords>Database Viewer</keywords>
 		</portlet-info>
 		<security-role-ref>
 			<role-name>administrator</role-name>

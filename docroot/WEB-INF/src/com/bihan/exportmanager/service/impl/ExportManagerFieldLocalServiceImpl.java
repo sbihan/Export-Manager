@@ -14,7 +14,11 @@
 
 package com.bihan.exportmanager.service.impl;
 
+import com.bihan.exportmanager.model.ExportManagerField;
 import com.bihan.exportmanager.service.base.ExportManagerFieldLocalServiceBaseImpl;
+import com.liferay.portal.kernel.exception.SystemException;
+
+import java.util.List;
 
 /**
  * The implementation of the export manager field local service.
@@ -37,4 +41,9 @@ public class ExportManagerFieldLocalServiceImpl
 	 *
 	 * Never reference this interface directly. Always use {@link com.bihan.exportmanager.service.ExportManagerFieldLocalServiceUtil} to access the export manager field local service.
 	 */
+	
+	public List<ExportManagerField> getExportManagerFields(long exportManagerId) throws SystemException {
+	
+		return exportManagerFieldPersistence.findByExportManagerId(exportManagerId);
+	}
 }

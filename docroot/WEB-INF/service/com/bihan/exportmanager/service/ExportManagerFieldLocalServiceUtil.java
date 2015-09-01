@@ -274,6 +274,12 @@ public class ExportManagerFieldLocalServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
+	public static java.util.List<com.bihan.exportmanager.model.ExportManagerField> getExportManagerFields(
+		long exportManagerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getExportManagerFields(exportManagerId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

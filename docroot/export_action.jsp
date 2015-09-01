@@ -1,3 +1,6 @@
+<%@page import="com.bihan.exportmanager.model.ExportManager"%>
+<%@page import="com.liferay.portal.kernel.util.WebKeys"%>
+<%@page import="com.liferay.portal.kernel.dao.search.ResultRow"%>
 <%
 /**
  * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
@@ -16,9 +19,35 @@
 
 <%@ include file="init.jsp" %>
 
+<%
+	ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
+	
+	ExportManager exportManager = (ExportManager)row.getObject();
+		 
+	pageContext.setAttribute("exportManager", exportManager);
+
+%>	
+
 <liferay-ui:icon-menu>
+
+		<portlet:renderURL var="viewExportURL">
+			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.VIEW %>" />
+			<portlet:param name="mvcPath" value="/view_export.jsp" />
+			<portlet:param name="exportManagerId" value="${exportManager.exportManagerId}" />
+			<portlet:param name="currentURL" value="<%=themeDisplay.getURLCurrent() %>"/>
+		</portlet:renderURL>
+
+		<liferay-ui:icon
+			image="view"
+			url="<%= viewExportURL %>"
+		/>
+		
+		
 		<portlet:renderURL var="editExportURL">
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EDIT %>" />
+			<portlet:param name="mvcPath" value="/add_export.jsp" />
+			<portlet:param name="exportManagerId" value="${exportManager.exportManagerId}" />
+			<portlet:param name="currentURL" value="<%=themeDisplay.getURLCurrent() %>"/>
 		</portlet:renderURL>
 
 		<liferay-ui:icon
@@ -26,9 +55,11 @@
 			url="<%= editExportURL %>"
 		/>
 		
-		<portlet:renderURL var="deleteExportURL">
+		<portlet:actionURL var="deleteExportURL">
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
-		</portlet:renderURL>
+			<portlet:param name="exportManagerId" value="${exportManager.exportManagerId}" />
+			<portlet:param name="redirect" value="<%=themeDisplay.getURLCurrent() %>"/>
+		</portlet:actionURL>
 
 		<liferay-ui:icon
 			image="delete"

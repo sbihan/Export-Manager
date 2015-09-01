@@ -16,33 +16,50 @@
 
 <%@ include file="init.jsp" %>
 
-
-
 <portlet:actionURL var="editExportURL">
-	<portlet:param name="action" value="add_export"/>
+	<portlet:param name="<%=Constants.CMD%>" value="<%=Constants.ADD%>"/>
 </portlet:actionURL>
 
 <portlet:resourceURL var="classNameURL">
 </portlet:resourceURL>
-<p id="demo"></p>
+
+<c:if test='${not empty exportManager}'>
+	<c:set var="exportManagerId" value="${exportManager.exportManagerId}" />
+	<c:set var="exportManagerName" value="${exportManager.name}" />
+	<c:set var="exportManagerDescription" value="${exportManager.description}" />
+	<c:set var="exportManagerNameClassNameId" value="${exportManager.classNameId}" />
+</c:if>
+<c:if test='${empty exportManager}'>
+	<c:set var="exportManagerId" value="0l" />
+	<c:set var="exportManagerName" value="" />
+	<c:set var="exportManagerDescription" value="" />
+	<c:set var="exportManagerNameClassNameId" value="0" />
+</c:if>
+
+<liferay-ui:header backURL="${backURL}" title="add-export"></liferay-ui:header>
 
 <aui:form action="<%= editExportURL %>" method="post" name="fm" >
 
 	<aui:fieldset>
-	
-		<aui:input name="name" />
-	
-		<aui:input cssClass="lfr-textarea-container" type="textarea" name="description" />
 		
-		<aui:select id="scope" name="scope" label="scope">
-			<aui:option label="<%=ExportManagerConstant.SCOPE_SITE %>" value="<%=ExportManagerConstant.SCOPE_SITE %>"/>
-			<aui:option label="<%=ExportManagerConstant.SCOPE_PORTAL %>" value="<%=ExportManagerConstant.SCOPE_PORTAL %>"/>
-		</aui:select>
+		<aui:input name="exportManagerId" value="${exportManagerId}" type="hidden"/>
+		<aui:input name="redirect" value="${backURL}" type="hidden"/>
 		
-		<aui:select id="classNameSelectId" name="classNameId" label="className">
-			<aui:option label="className" value=""/>
+		<aui:input label="name" name="name" value="${exportManagerName}"><aui:validator name="required"/></aui:input>
+	
+		<aui:input label="description" cssClass="lfr-textarea-container" type="textarea" name="description" value="${exportManagerDescription}"/>
+		
+		<div style="display:none;">
+			<aui:select id="scope" name="scope" label="scope">
+				<aui:option label="<%=ExportManagerConstant.SCOPE_SITE %>" value="<%=ExportManagerConstant.SCOPE_SITE %>"/>
+				<aui:option label="<%=ExportManagerConstant.SCOPE_PORTAL %>" value="<%=ExportManagerConstant.SCOPE_PORTAL %>"/>
+			</aui:select>
+		</div>
+		
+		<aui:select id="classNameSelectId" name="classNameId" label="Class Name" required="<%= true %>">
+			<aui:option label="className" value="" disabled="<%= true %>" selected="${empty exportManager}"/>
 			<c:forEach items="${classNames}" var="item">
-				<aui:option label="${item.value}" value="${item.classNameId}"/>	
+				<aui:option selected="${exportManagerNameClassNameId == item.classNameId}" label="${item.value}" value="${item.classNameId}"/>	
 			</c:forEach>
 		</aui:select>	
 		
@@ -53,7 +70,7 @@
 		<aui:button-row>
 			<aui:button type="submit" />
 
-			<aui:button href="#" type="cancel" />
+			<aui:button href="${backURL}" type="cancel" />
 		</aui:button-row>
 
 	</aui:fieldset>
@@ -105,10 +122,8 @@
 							var index = 1;
 							
 							for (var key in result) {
-								
-							   console.log(' name=' + key + ' value=' + result[key]);
-							
-								var newNodeObject = A.Node.create('<input id="checkbox_'+key+'" class="checkbox_attributes" type="checkbox" name="attributes_'+index+'" value="'+key+'" onchange="<portlet:namespace />displayNextInput(this);">&nbsp;'+result[key]+'&nbsp;</input><input id="display_name_'+key+'" name="display_name_'+index+'" style="display:none;width:200px;margin: 3px 0;" type="text"></input>&nbsp;<select id="display_name_'+key+'" name="position_attributes_'+index+'" class="select_attributes" style="display:none;"></select><br/>');
+															
+								var newNodeObject = A.Node.create('<input id="checkbox_'+key+'" class="checkbox_attributes" type="checkbox" name="attributes_'+index+'" value="'+key+'" onchange="<portlet:namespace />displayNextInput(this);">&nbsp;'+result[key]+'&nbsp;</input><input id="display_name_'+key+'" name="display_name_'+index+'" style="display:none;width:200px;margin: 3px 0;" type="text"></input>&nbsp;<select id="position_'+key+'" name="position_attributes_'+index+'" class="select_attributes" style="display:none;"></select><br/>');
 								
 								index++;
 								
@@ -122,7 +137,6 @@
 					             
 					             while (increment < index) {
 								    var text = increment;
-								    console.log(text);
 								    var option = document.createElement("option");
 								    option.value = increment;
 								    option.text = increment;
@@ -130,6 +144,23 @@
 								    increment++;
 								}
 					        }); 
+					        
+					       <c:if test='${not empty exportManager}'>
+						       	<c:forEach items="${exportManagerFields}" var="exportManagerField">
+							    	var exportManagerFieldName = "${exportManagerField.fieldName}";
+						
+							    	var checkboxField  = document.getElementById('checkbox_'+exportManagerFieldName).checked = true;
+							    		
+								    var	displayNameField = document.getElementById('display_name_'+exportManagerFieldName);
+								    displayNameField.style.display = "inline";
+								    displayNameField.value = "${exportManagerField.fieldDisplayName}";
+								    
+								   	var	positionField = document.getElementById('position_'+exportManagerFieldName);
+								   	positionField.style.display = "inline";
+								   	positionField.selectedIndex=${exportManagerField.position}-1;
+							    
+							    </c:forEach>
+					       </c:if> 
 														
 						}						
 					}
@@ -148,6 +179,10 @@
        			<portlet:namespace />chargerAjaxRefreshArea();
        		}
           );
+          
+		<c:if test='${not empty exportManager}'>
+		    <portlet:namespace />chargerAjaxRefreshArea();
+		</c:if>
       }
       
       

@@ -272,6 +272,12 @@ public class ExportManagerFieldLocalServiceWrapper
 			parameterTypes, arguments);
 	}
 
+	public java.util.List<com.bihan.exportmanager.model.ExportManagerField> getExportManagerFields(
+		long exportManagerId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _exportManagerFieldLocalService.getExportManagerFields(exportManagerId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

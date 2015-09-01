@@ -4,30 +4,30 @@ import com.bihan.exportmanager.model.ExportManager;
 import com.bihan.exportmanager.model.ExportManagerField;
 import com.bihan.exportmanager.service.ExportManagerFieldLocalServiceUtil;
 import com.bihan.exportmanager.service.ExportManagerLocalServiceUtil;
-import com.bihan.exportmanager.util.ClassNameComparator;
+import com.bihan.exportmanager.util.ExportManagerDTO;
+import com.bihan.exportmanager.util.ExportManagerFieldComparator;
 import com.bihan.exportmanager.util.ExportManagerUtil;
 import com.liferay.counter.service.CounterLocalServiceUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.portlet.PortletResponseUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.Http.Response;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.StringUtil_IW;
 import com.liferay.portal.model.ClassName;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
-import com.liferay.portal.service.persistence.OrgGroupPermissionFinderUtil;
-import com.liferay.portal.service.persistence.OrgGroupPermissionUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
-import com.sun.xml.internal.ws.util.StringUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +39,7 @@ import java.util.Map;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
+import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -46,24 +47,142 @@ import javax.portlet.ResourceResponse;
 
 public class ExportManagerController extends MVCPortlet {
 	
-	private static final String RENDER_PARAM_ADD_EXPORT="add_export";
+	private static final Log LOG = LogFactoryUtil.getLog(ExportManagerController.class);
 
-	private static final String ACTION_PARAM = "action";
-	
 	String[] blackAttributes = {"getExpandoBridge","getPrimaryKey","getPrimaryKeyObj","getModelAttributes","getModelClass","getModelClassName"};
 	List<String> blackAttributesList =Arrays.asList(blackAttributes);
 
+	@Override
+	public void render(RenderRequest request, RenderResponse response)
+			throws PortletException, IOException {
+		// TODO Auto-generated method stub
+		
+		String cmd = ParamUtil.getString(request, Constants.CMD, StringPool.BLANK);
+		String currentURL = ParamUtil.getString(request, "currentURL");
+		
+		try{
+			if(Constants.ADD.equals(cmd)){
+							
+				List<ClassName> localServiceClassNames = ExportManagerUtil.getUnLocalServiceClassNames();			
+								
+				request.setAttribute("classNames", localServiceClassNames);		
+				
+				request.setAttribute("backURL",currentURL);
+
+			} else if(Constants.EDIT.equals(cmd)){
+				
+				long exportManagerId = ParamUtil.getLong(request, "exportManagerId");
+
+				ExportManager exportManager = ExportManagerLocalServiceUtil.getExportManager(exportManagerId);
+				List<ExportManagerField> exportManagerFields = ExportManagerFieldLocalServiceUtil.getExportManagerFields(exportManagerId);
+				List<ClassName> localServiceClassNames = ExportManagerUtil.getUnLocalServiceClassNames();			
+				
+				request.setAttribute("classNames", localServiceClassNames);	
+				request.setAttribute("exportManager", exportManager);		
+				request.setAttribute("exportManagerFields", exportManagerFields);		
+				request.setAttribute("backURL",currentURL);
+
+			} else if(Constants.VIEW.equals(cmd)){
+				
+				long exportManagerId = ParamUtil.getLong(request, "exportManagerId");
+		
+				ExportManager exportManager = ExportManagerLocalServiceUtil.getExportManager(exportManagerId);
+				
+				ExportManagerDTO exportManagerDTO = new ExportManagerDTO();
+				
+				exportManagerDTO.setExportManager(exportManager);
+				
+				ClassName className = ClassNameLocalServiceUtil.getClassName(exportManager.getClassNameId());
+				
+				exportManagerDTO.setClassName(className);
+				
+				Method methodCOUNT = ExportManagerUtil.getEntitiesMethodCount(className);
+				
+				int sizeObject = (Integer) methodCOUNT.invoke(null);
+						
+				exportManagerDTO.setSizeObjects(sizeObject);
+
+				List<ExportManagerField> exportManagerFields = ExportManagerFieldLocalServiceUtil.getExportManagerFields(exportManagerId);
+				
+				List<ExportManagerField> exportManagerFieldsSort = new ArrayList<ExportManagerField>(exportManagerFields);
+				
+				Collections.sort(exportManagerFieldsSort, new ExportManagerFieldComparator());
+				
+				exportManagerDTO.setFields(exportManagerFieldsSort);
+
+				PortletURL portletURL = response.createRenderURL();
+				
+				portletURL.setParameter("mvcPath", "/view_export.jsp");
+				portletURL.setParameter(Constants.CMD, Constants.VIEW);
+				portletURL.setParameter("exportManagerId", String.valueOf(exportManagerId));
+				portletURL.setParameter("currentURL", currentURL);
+
+				exportManagerDTO.setPortletURL(portletURL);
+				
+				request.setAttribute("exportManagerDTO", exportManagerDTO);
+				request.setAttribute("backURL",currentURL);
+				request.setAttribute("classNameValue",className.getValue());
+
+			}
+			
+		} catch (PortalException e) {
+			LOG.error("PortalException on render : "+ e.getMessage());
+			if (LOG.isDebugEnabled()) {
+				LOG.error(e);
+			}
+		} catch (SystemException e) {
+			LOG.error("SystemException on render : "+ e.getMessage());
+			if (LOG.isDebugEnabled()) {
+				LOG.error(e);
+			}
+		} catch (SecurityException e) {
+			LOG.error("SecurityException on render : "+ e.getMessage());
+			if (LOG.isDebugEnabled()) {
+				LOG.error(e);
+			}
+		} catch (IllegalAccessException e) {
+			LOG.error("IllegalAccessException on render : "+ e.getMessage());
+			if (LOG.isDebugEnabled()) {
+				LOG.error(e);
+			}
+		} catch (IllegalArgumentException e) {
+			LOG.error("IllegalArgumentException on render : "+ e.getMessage());
+			if (LOG.isDebugEnabled()) {
+				LOG.error(e);
+			}
+		} catch (InvocationTargetException e) {
+			LOG.error("InvocationTargetException on render : "+ e.getMessage());
+			if (LOG.isDebugEnabled()) {
+				LOG.error(e);
+			}
+		}
+		
+		
+		super.render(request, response);
+	}
+	
 	@Override
 	public void processAction(ActionRequest actionRequest,
 			ActionResponse actionResponse) throws IOException, PortletException {
 		
 		
-		String action = ParamUtil.getString(actionRequest, ACTION_PARAM, StringPool.BLANK);
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD, StringPool.BLANK);
+		String redirectURL = ParamUtil.getString(actionRequest, "redirect", StringPool.BLANK);
 		
-		if(RENDER_PARAM_ADD_EXPORT.equals(action)){
+		if(Constants.ADD.equals(cmd)){
 			try {
 				
-				ExportManager exportManager = ExportManagerLocalServiceUtil.createExportManager(CounterLocalServiceUtil.increment(ExportManager.class.getName()));
+				long exportManagerId = ParamUtil.getLong(actionRequest, "exportManagerId", 0l);
+
+				
+				ExportManager exportManager = null;
+						
+				if(exportManagerId==0l){
+					exportManager = ExportManagerLocalServiceUtil.createExportManager(CounterLocalServiceUtil.increment(ExportManager.class.getName()));
+				} else{
+					exportManager = ExportManagerLocalServiceUtil.getExportManager(exportManagerId);
+				}
+						
 				
 				String name = ParamUtil.getString(actionRequest, "name");
 				String description = ParamUtil.getString(actionRequest, "description");
@@ -76,7 +195,14 @@ public class ExportManagerController extends MVCPortlet {
 				exportManager.setClassNameId(classNameId);
 				exportManager.setClassNameValue(ClassNameLocalServiceUtil.getClassName(classNameId).getClassName());
 				
-				ExportManagerLocalServiceUtil.addExportManager(exportManager);
+				if(exportManagerId==0l){
+					ExportManagerLocalServiceUtil.addExportManager(exportManager);
+				} else{
+					ExportManagerLocalServiceUtil.updateExportManager(exportManager);
+					for(ExportManagerField exportManagerField : ExportManagerFieldLocalServiceUtil.getExportManagerFields(exportManagerId)){
+						ExportManagerFieldLocalServiceUtil.deleteExportManagerField(exportManagerField);
+					}
+				}
 				
 				int resultSize = ParamUtil.getInteger(actionRequest, "result_size");
 
@@ -100,39 +226,53 @@ public class ExportManagerController extends MVCPortlet {
 						exportManagerField.setPosition(positionName);
 						
 						ExportManagerFieldLocalServiceUtil.addExportManagerField(exportManagerField);
+
 					}
 				}
+				
+				SessionMessages.add(actionRequest, "actionSuccessExportManager");
 					
 			} catch (SystemException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("SystemException when ADD or EDIT an export : "+ e.getMessage());
+				if (LOG.isDebugEnabled()) {
+					LOG.error(e);
+				}
+				SessionErrors.add(actionRequest, "actionErrorExportManager");
 			} catch (PortalException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("PortalException when ADD or EDIT an export : "+ e.getMessage());
+				if (LOG.isDebugEnabled()) {
+					LOG.error(e);
+				}
+				SessionErrors.add(actionRequest, "actionErrorExportManager");
+			}
+		} else if(Constants.DELETE.equals(cmd)){
+			long exportManagerId = ParamUtil.getLong(actionRequest, "exportManagerId", 0l);
+
+			try{
+				ExportManagerLocalServiceUtil.deleteExportManager(exportManagerId);
+				for(ExportManagerField exportManagerField : ExportManagerFieldLocalServiceUtil.getExportManagerFields(exportManagerId)){
+					ExportManagerFieldLocalServiceUtil.deleteExportManagerField(exportManagerField);
+				}
+				SessionMessages.add(actionRequest, "actionSuccessExportManager");
+
+			} catch (SystemException e) {
+				LOG.error("SystemException when DELETE an export : "+ e.getMessage());
+				if (LOG.isDebugEnabled()) {
+					LOG.error(e);
+				}
+				SessionErrors.add(actionRequest, "actionErrorExportManager");
+			} catch (PortalException e) {
+				LOG.error("PortalException when DELETE an export : "+ e.getMessage());
+				if (LOG.isDebugEnabled()) {
+					LOG.error(e);
+				}
+				SessionErrors.add(actionRequest, "actionErrorExportManager");
 			}
 		}
+						
+		actionResponse.sendRedirect(redirectURL);
 		
 		super.processAction(actionRequest, actionResponse);		
-	}
-
-	@Override
-	public void render(RenderRequest request, RenderResponse response)
-			throws PortletException, IOException {
-		// TODO Auto-generated method stub
-		
-		String action = ParamUtil.getString(request, ACTION_PARAM, StringPool.BLANK);
-		
-		if(RENDER_PARAM_ADD_EXPORT.equals(action)){
-						
-			List<ClassName> localServiceClassNames = ExportManagerUtil.getUnLocalServiceClassNames();			
-			
-			Collections.sort(localServiceClassNames, new ClassNameComparator());
-			
-			request.setAttribute("classNames", localServiceClassNames);		
-			
-		}
-		
-		super.render(request, response);
 	}
 
 
@@ -164,6 +304,7 @@ public class ExportManagerController extends MVCPortlet {
 				String methodName = methods[i].getName();
 				if(!methodName.startsWith("set") && methodName.startsWith("get") && !blackAttributesList.contains(methodName)){
 					methodName = methodName.replaceFirst("get", "");
+					methodName = methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
 					entityAttributesDTO.put(methodName, methodName);
 					jsonObjectDirect.put(methodName, methodName);
 				}
@@ -171,33 +312,33 @@ public class ExportManagerController extends MVCPortlet {
 									
 			resourceResponse.setContentType(ContentTypes.APPLICATION_JSON);
 			
-			PortletResponseUtil.write(resourceResponse, jsonObjectDirect.toString());
-		
+			PrintWriter writer = resourceResponse.getWriter();
+			
+			writer.write(jsonObjectDirect.toString());
+			writer.close();
+
 		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("NumberFormatException on attributes load for classNameId : "+classNameSelectId+" : "+ e.getMessage());
+			if (LOG.isDebugEnabled()) {
+				LOG.error(e);
+			}
 		} catch (PortalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("PortalException on attributes load for classNameId : "+classNameSelectId+" : "+ e.getMessage());
+			if (LOG.isDebugEnabled()) {
+				LOG.error(e);
+			}
 		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("SystemException on attributes load for classNameId : "+classNameSelectId+" : "+ e.getMessage());
+			if (LOG.isDebugEnabled()) {
+				LOG.error(e);
+			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("ClassNotFoundException on attributes load for classNameId : "+classNameSelectId+" : "+ e.getMessage());
+			if (LOG.isDebugEnabled()) {
+				LOG.error(e);
+			}
 		}
 		
 		super.serveResource(resourceRequest, resourceResponse);
 	}
-	
-	
-	private String removeLastComma(String str) {
-	    if (str.length() > 0) {
-	      str = str.substring(0, str.length()-1);
-	    }
-	    return str;
-	}
-
-	
-	
 }
