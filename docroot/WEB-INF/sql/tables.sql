@@ -18,10 +18,3 @@ create table EM_ExportManagerField (
 	fieldDisplayName VARCHAR(75) null,
 	position INTEGER
 );
-
-create table EM_ExportManagerFields (
-	exportManagerFieldsId LONG not null primary key,
-	exportManagerId LONG,
-	fieldName VARCHAR(75) null,
-	fieldLabel VARCHAR(75) null
-);

@@ -15,11 +15,7 @@
 		<supports>
 			<mime-type>text/html</mime-type>
 		</supports>
-		<portlet-info>
-			<title>Database Viewer</title>
-			<short-title>Database Viewer</short-title>
-			<keywords>Database Viewer</keywords>
-		</portlet-info>
+		<resource-bundle>content.Language</resource-bundle>
 		<security-role-ref>
 			<role-name>administrator</role-name>
 		</security-role-ref>
